@@ -14,6 +14,7 @@ PLATFORMS = ["binary_sensor", "sensor", "water_heater", "climate", "fan"]
 PRESET_DAY = "day"
 PRESET_COOLING_ON = "cooling_on"
 PRESET_MANUAL = "manual"
+PRESET_OFF = "room_off"
 PRESET_SYSTEM_OFF = "system_off"
 PRESET_PARTY = "party"
 PRESET_HOLIDAY = "holiday"

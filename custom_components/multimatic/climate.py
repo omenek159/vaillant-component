@@ -46,6 +46,7 @@ from .const import (
     PRESET_PARTY,
     PRESET_QUICK_VETO,
     PRESET_SYSTEM_OFF,
+    PRESET_OFF,
     ROOMS,
     VENTILATION,
     ZONES,
@@ -214,21 +215,23 @@ class RoomClimate(MultimaticClimate):
 
     _MULTIMATIC_TO_HA: dict[Mode, list] = {
         OperatingModes.AUTO: [HVACMode.AUTO, PRESET_COMFORT],
-        OperatingModes.OFF: [HVACMode.OFF, PRESET_NONE],
+        OperatingModes.OFF: [HVACMode.OFF, PRESET_OFF],
         OperatingModes.QUICK_VETO: [None, PRESET_QUICK_VETO],
         QuickModes.SYSTEM_OFF: [HVACMode.OFF, PRESET_SYSTEM_OFF],
         QuickModes.HOLIDAY: [HVACMode.OFF, PRESET_HOLIDAY],
-        OperatingModes.MANUAL: [None, PRESET_MANUAL],
+        OperatingModes.MANUAL: [HVACMode.HEAT, PRESET_MANUAL],
     }
 
     _HA_MODE_TO_MULTIMATIC = {
         HVACMode.AUTO: OperatingModes.AUTO,
+        HVACMode.HEAT: OperatingModes.MANUAL,
         HVACMode.OFF: OperatingModes.OFF,
     }
 
     _HA_PRESET_TO_MULTIMATIC = {
         PRESET_COMFORT: OperatingModes.AUTO,
         PRESET_MANUAL: OperatingModes.MANUAL,
+        PRESET_OFF: OperatingModes.OFF,
         PRESET_SYSTEM_OFF: QuickModes.SYSTEM_OFF,
     }
 
