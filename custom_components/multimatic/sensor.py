@@ -39,9 +39,9 @@ async def async_setup_entry(
 ) -> None:
     """Set up the multimatic sensors."""
     sensors: list[MultimaticEntity] = []
-    outdoor_temp_coo = get_coordinator(hass, OUTDOOR_TEMP, entry.unique_id)
-    reports_coo = get_coordinator(hass, REPORTS, entry.unique_id)
-    emf_reports_coo = get_coordinator(hass, EMF_REPORTS, entry.unique_id)
+    outdoor_temp_coo = get_coordinator(hass, OUTDOOR_TEMP, entry.entry_id)
+    reports_coo = get_coordinator(hass, REPORTS, entry.entry_id)
+    emf_reports_coo = get_coordinator(hass, EMF_REPORTS, entry.entry_id)
 
     if outdoor_temp_coo.data:
         sensors.append(OutdoorTemperatureSensor(outdoor_temp_coo))
@@ -107,7 +107,9 @@ class ReportSensor(MultimaticEntity, SensorEntity):
 
     def __init__(self, coordinator: MultimaticCoordinator, report: Report) -> None:
         """Init entity."""
-        MultimaticEntity.__init__(self, coordinator, DOMAIN, report.id)
+        MultimaticEntity.__init__(
+            self, coordinator, DOMAIN, f"{report.device_id}_{report.id}"
+        )
         self._report_id = report.id
         self._unit = report.unit
         self._name = report.name
@@ -122,7 +124,7 @@ class ReportSensor(MultimaticEntity, SensorEntity):
             (
                 report
                 for report in self.coordinator.data
-                if report.id == self._report_id
+                if report.device_id == self._device_id and report.id == self._report_id
             ),
             None,
         )

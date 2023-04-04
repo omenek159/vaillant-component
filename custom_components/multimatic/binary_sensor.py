@@ -13,9 +13,10 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
-from homeassistant.helpers.entity import DeviceInfo, EntityCategory
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
@@ -43,13 +44,13 @@ async def async_setup_entry(
     """Set up the multimatic binary sensor platform."""
     sensors: list[MultimaticEntity] = []
 
-    dhw_coo = get_coordinator(hass, DHW, entry.unique_id)
+    dhw_coo = get_coordinator(hass, DHW, entry.entry_id)
     if dhw_coo.data and dhw_coo.data.circulation:
         sensors.append(CirculationSensor(dhw_coo))
 
-    hvac_coo = get_coordinator(hass, HVAC_STATUS, entry.unique_id)
-    detail_coo = get_coordinator(hass, FACILITY_DETAIL, entry.unique_id)
-    gw_coo = get_coordinator(hass, GATEWAY, entry.unique_id)
+    hvac_coo = get_coordinator(hass, HVAC_STATUS, entry.entry_id)
+    detail_coo = get_coordinator(hass, FACILITY_DETAIL, entry.entry_id)
+    gw_coo = get_coordinator(hass, GATEWAY, entry.entry_id)
     if hvac_coo.data:
         sensors.append(BoxOnline(hvac_coo, detail_coo, gw_coo))
         sensors.append(BoxUpdate(hvac_coo, detail_coo, gw_coo))
@@ -58,7 +59,7 @@ async def async_setup_entry(
         if hvac_coo.data.boiler_status:
             sensors.append(BoilerStatus(hvac_coo))
 
-    rooms_coo = get_coordinator(hass, ROOMS, entry.unique_id)
+    rooms_coo = get_coordinator(hass, ROOMS, entry.entry_id)
     if rooms_coo.data:
         for room in rooms_coo.data:
             sensors.append(RoomWindow(rooms_coo, room))
@@ -70,8 +71,8 @@ async def async_setup_entry(
 
     sensors.extend(
         [
-            HolidayModeSensor(get_coordinator(hass, HOLIDAY_MODE, entry.unique_id)),
-            QuickModeSensor(get_coordinator(hass, QUICK_MODE, entry.unique_id)),
+            HolidayModeSensor(get_coordinator(hass, HOLIDAY_MODE, entry.entry_id)),
+            QuickModeSensor(get_coordinator(hass, QUICK_MODE, entry.entry_id)),
         ]
     )
 
@@ -315,7 +316,7 @@ class VRBoxEntity(MultimaticEntity, BinarySensorEntity):
         detail_coo: MultimaticCoordinator,
         gw_coo: MultimaticCoordinator,
         comp_id,
-    ):
+    ) -> None:
         """Initialize entity."""
         MultimaticEntity.__init__(self, coord, DOMAIN, comp_id)
         self._detail_coo = detail_coo
